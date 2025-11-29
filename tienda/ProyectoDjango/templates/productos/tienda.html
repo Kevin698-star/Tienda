@@ -1,0 +1,526 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Productos - Supermercado Online</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+            min-height: 100vh;
+            padding: 0;
+            color: #333;
+        }
+
+        /* Header con búsqueda */
+        .header-wrapper {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid #7c3aed;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-section h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+        }
+
+        .search-button {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        /* Hero section */
+        .hero-section {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-section h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero-section p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        /* Secciones de productos */
+        .seccion {
+            margin-bottom: 70px;
+        }
+
+        .encabezado-seccion {
+            background: white;
+            padding: 25px 35px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            animation: slideIn 0.6s ease;
+            border-left: 6px solid #7c3aed;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .titulo-seccion {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Grid de productos */
+        .catalogo {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: cardFadeIn 0.5s ease backwards;
+            border: 3px solid transparent;
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.15s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.25s; }
+        .card:nth-child(5) { animation-delay: 0.3s; }
+        .card:nth-child(6) { animation-delay: 0.35s; }
+
+        .card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(124, 58, 237, 0.3);
+            border-color: #a855f7;
+        }
+
+        .card-imagen {
+            position: relative;
+            height: 280px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f3ff 0%, #e9d5ff 100%);
+        }
+
+        .card-imagen img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .card:hover .card-imagen img {
+            transform: scale(1.15);
+        }
+
+        .badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(124, 58, 237, 0.95);
+            backdrop-filter: blur(10px);
+            color: white;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge-api {
+            background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
+        }
+
+        .card-contenido {
+            padding: 24px;
+        }
+
+        .card-contenido h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #2d3748;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .descripcion {
+            color: #718096;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            padding: 0 24px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .precio {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .btn-ver {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .btn-ver:hover {
+            transform: translateX(3px);
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.5);
+            background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+        }
+
+        .no-productos {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            border: 3px dashed #c084fc;
+        }
+
+        .no-productos p {
+            font-size: 1.3rem;
+            color: #7c3aed;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .search-form {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .hero-section h2 {
+                font-size: 2rem;
+            }
+
+            .hero-section p {
+                font-size: 1rem;
+            }
+
+            .catalogo {
+                grid-template-columns: 1fr;
+            }
+
+            .card-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-ver {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 40px 15px;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header sticky con búsqueda -->
+<div class="header-wrapper">
+    <div class="header-container">
+        <div class="logo-section">
+            <span class="logo-icon">🛒</span>
+            <h1>MAYORISTA Online</h1>
+        </div>
+        <form method="get" class="search-form">
+            <input 
+                type="text" 
+                name="q" 
+                class="search-input"
+                placeholder="Buscar productos del supermercado..." 
+                value="{{ query }}"
+            >
+            <button type="submit" class="search-button">
+                🔍 Buscar
+            </button>
+        </form>
+        <!-- Botón de ver carrito -->
+        <div>
+            <a href="{% url 'ver_carrito' %}" class="search-button">
+                🛒 Ver Carrito
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Hero -->
+    <div class="hero-section">
+        <h2>🛍️ Catálogo de Productos</h2>
+        <p>Encuentra todo lo que necesitas para tu hogar</p>
+    </div>
+
+    <!-- Sección: Productos Locales -->
+    <section class="seccion">
+        <div class="encabezado-seccion">
+            <h2 class="titulo-seccion">
+                <span>🏪</span>
+                Productos de Nuestra Tienda
+            </h2>
+        </div>
+
+        <div class="catalogo">
+            {% for p in productos_locales %}
+            <article class="card">
+                <div class="card-imagen">
+                    {% if p.imagen %}
+                        <img src="{{ p.imagen.url }}" alt="{{ p.nombre }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/300x320/7c3aed/ffffff?text={{ p.nombre|truncatewords:2 }}" alt="{{ p.nombre }}">
+                    {% endif %}
+                    <span class="badge">🏷️ Nuestro Producto</span>
+                </div>
+                <div class="card-contenido">
+                    <h3>{{ p.nombre }}</h3>
+                    <p class="descripcion">{{ p.descripcion }}</p>
+                </div>
+                <div class="card-footer">
+                    <span class="precio">${{ p.precio }}</span>
+                    <form action="{% url 'agregar_al_carrito' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="tipo" value="local">
+                        <input type="hidden" name="producto_id" value="{{ p.id }}">
+                        <button type="submit" class="btn-ver">🛒 Agregar</button>
+                    </form>
+                </div>
+            </article>
+            {% empty %}
+            <div class="no-productos">
+                <p>📦 No hay productos disponibles en este momento</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Sección: Productos API -->
+    <section class="seccion">
+        <div class="encabezado-seccion">
+            <h2 class="titulo-seccion">
+                <span>🌍</span>
+                Productos de Proveedores
+            </h2>
+        </div>
+
+        <div class="catalogo">
+            {% for p in productos_api %}
+            <article class="card">
+                <div class="card-imagen">
+                    <img src="{{ p.thumbnail }}" alt="{{ p.title }}">
+                    <span class="badge badge-api">🌐 Proveedor Externo</span>
+                </div>
+                <div class="card-contenido">
+                    <h3>{{ p.title }}</h3>
+                    <p class="descripcion">{{ p.description|truncatewords:20 }}</p>
+                </div>
+                <div class="card-footer">
+                    <span class="precio">${{ p.price }}</span>
+                    <form action="{% url 'agregar_al_carrito' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="tipo" value="api">
+                        <input type="hidden" name="nombre" value="{{ p.title }}">
+                        <input type="hidden" name="precio" value="{{ p.price }}">
+                        <input type="hidden" name="imagen" value="{{ p.thumbnail }}">
+                        <button type="submit" class="btn-ver">🛒 Agregar</button>
+                    </form>
+                </div>
+            </article>
+            {% empty %}
+            <div class="no-productos">
+                <p>🌍 No hay productos de proveedores disponibles</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+</body>
+</html>
