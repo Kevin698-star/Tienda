@@ -1,0 +1,113 @@
+{% extends 'apis/base.html' %}
+
+{% block title %}Productos API{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2>🛍️ Productos de API</h2>
+        <div style="display: flex; gap: 0.5rem;">
+            <form method="post" action="{% url 'apis:sincronizar_productos' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">🔄 Sincronizar</button>
+            </form>
+            <form method="post" action="{% url 'apis:actualizar_precios' %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning">💱 Actualizar Precios COP</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="filters">
+        <form method="get">
+            <div style="flex: 1; min-width: 200px;">
+                <input type="text" name="q" class="form-control" placeholder="Buscar por nombre..." value="{{ busqueda }}">
+            </div>
+            <div style="min-width: 150px;">
+                <select name="categoria" class="form-control">
+                    <option value="">Todas las categorías</option>
+                    {% for cat in categorias %}
+                    <option value="{{ cat }}" {% if categoria_actual == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="{% url 'apis:lista_productos' %}" class="btn" style="background: #e0e0e0;">Limpiar</a>
+        </form>
+    </div>
+</div>
+
+{% if productos %}
+<div class="grid">
+    {% for producto in productos %}
+    <div class="product-card">
+        {% if producto.imagen_url %}
+        <img src="{{ producto.imagen_url }}" 
+             alt="{{ producto.titulo }}" 
+             loading="lazy"
+             crossorigin="anonymous"
+             onerror="this.onerror=null; this.src='https://placehold.co/300x200/667eea/white?text=Producto';">
+        {% else %}
+        <img src="https://placehold.co/300x200/667eea/white?text=Producto" alt="Sin imagen">
+        {% endif %}
+        <div class="product-card-body">
+            <span class="category">{{ producto.categoria }}</span>
+            <h3>{{ producto.titulo|truncatewords:6 }}</h3>
+            <div class="price">
+                💵 ${{ producto.precio_usd }} USD
+                {% if producto.precio_cop %}
+                <br><small style="color: #666;">💰 ${{ producto.precio_cop|floatformat:0 }} COP</small>
+                {% endif %}
+            </div>
+            <p style="color: #666; font-size: 0.9rem; margin: 0.5rem 0;">
+                {{ producto.descripcion|truncatewords:15 }}
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                <span style="color: #666; font-size: 0.9rem;">
+                    📦 Stock: {{ producto.stock }}
+                    {% if producto.rating %}
+                    <br>⭐ {{ producto.rating }}
+                    {% endif %}
+                </span>
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="{% url 'apis:detalle_producto' producto.id %}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Ver</a>
+                    <form method="post" action="{% url 'apis:eliminar_producto' producto.id %}" style="display: inline;" onsubmit="return confirm('¿Eliminar este producto?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">🗑️</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Paginación -->
+{% if productos.has_other_pages %}
+<div class="pagination">
+    {% if productos.has_previous %}
+    <a href="?page=1{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">« Primera</a>
+    <a href="?page={{ productos.previous_page_number }}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">‹ Anterior</a>
+    {% endif %}
+    
+    <span class="current">Página {{ productos.number }} de {{ productos.paginator.num_pages }}</span>
+    
+    {% if productos.has_next %}
+    <a href="?page={{ productos.next_page_number }}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">Siguiente ›</a>
+    <a href="?page={{ productos.paginator.num_pages }}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}{% if busqueda %}&q={{ busqueda }}{% endif %}">Última »</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <h3 style="color: #666; margin-bottom: 1rem;">No hay productos sincronizados</h3>
+    <p style="color: #999; margin-bottom: 2rem;">Sincroniza productos desde la API para comenzar</p>
+    <form method="post" action="{% url 'apis:sincronizar_productos' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Sincronizar Productos</button>
+    </form>
+</div>
+{% endif %}
+{% endblock %}

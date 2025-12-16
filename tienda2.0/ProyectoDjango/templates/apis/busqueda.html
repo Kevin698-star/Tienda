@@ -1,0 +1,70 @@
+{% extends 'apis/base.html' %}
+
+{% block title %}Buscar en API{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>🔍 Buscar Productos en API</h2>
+    <p style="color: #666; margin-bottom: 1.5rem;">Busca productos directamente en la API de DummyJSON (sin guardar en base de datos)</p>
+    
+    <form method="get" class="form-inline" style="margin-bottom: 2rem;">
+        <input type="text" name="q" class="form-control" placeholder="Buscar productos..." value="{{ query }}" style="flex: 1;">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+</div>
+
+{% if query %}
+    {% if productos %}
+    <div class="card">
+        <h3 style="margin-bottom: 1rem;">Resultados para "{{ query }}" ({{ productos|length }} productos)</h3>
+    </div>
+    
+    <div class="grid">
+        {% for producto in productos %}
+        <div class="product-card">
+            {% if producto.thumbnail %}
+            <img src="{{ producto.thumbnail }}" 
+                 alt="{{ producto.title }}"
+                 loading="lazy"
+                 crossorigin="anonymous"
+                 onerror="this.onerror=null; this.src='https://placehold.co/300x200/667eea/white?text=Producto';">
+            {% else %}
+            <img src="https://placehold.co/300x200/667eea/white?text=Producto" alt="Sin imagen">
+            {% endif %}
+            <div class="product-card-body">
+                <span class="category">{{ producto.category }}</span>
+                <h3>{{ producto.title|truncatewords:6 }}</h3>
+                <div class="price">
+                    💵 ${{ producto.price }} USD
+                    {% if producto.precio_cop %}
+                    <br><small style="color: #666;">💰 ${{ producto.precio_cop|floatformat:0 }} COP</small>
+                    {% endif %}
+                </div>
+                <p style="color: #666; font-size: 0.9rem; margin: 0.5rem 0;">
+                    {{ producto.description|truncatewords:15 }}
+                </p>
+                <div style="margin-top: 1rem;">
+                    <span style="color: #666; font-size: 0.9rem;">
+                        📦 Stock: {{ producto.stock }}
+                        {% if producto.rating %}
+                        | ⭐ {{ producto.rating }}
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="text-align: center; padding: 3rem;">
+        <h3 style="color: #666;">No se encontraron resultados para "{{ query }}"</h3>
+        <p style="color: #999;">Intenta con otra búsqueda</p>
+    </div>
+    {% endif %}
+{% else %}
+<div class="card" style="text-align: center; padding: 3rem;">
+    <h3 style="color: #666;">Introduce un término de búsqueda</h3>
+    <p style="color: #999;">Busca por nombre, categoría o marca</p>
+</div>
+{% endif %}
+{% endblock %}

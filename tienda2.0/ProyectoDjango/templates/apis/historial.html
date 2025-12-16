@@ -1,0 +1,107 @@
+{% extends 'apis/base.html' %}
+
+{% block title %}Historial MongoDB{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📜 Historial de Consultas (MongoDB)</h2>
+    <p style="color: #666; margin-bottom: 1.5rem;">
+        Historial de consultas almacenado en la base de datos no relacional MongoDB
+    </p>
+</div>
+
+<div class="card">
+    <h3 style="color: #667eea; margin-bottom: 1rem;">📦 DummyJSON API - Historial de Productos</h3>
+    {% if historial_dummy %}
+    <div>
+        {% for item in historial_dummy %}
+        <div class="historial-item {% if not item.exitoso %}error{% endif %}">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div style="flex: 1;">
+                    <strong style="color: #333;">{{ item.tipo|title }}</strong>
+                    {% if item.query %}
+                    <span style="color: #666;"> - Búsqueda: "{{ item.query }}"</span>
+                    {% endif %}
+                    {% if item.producto_id %}
+                    <span style="color: #666;"> - Producto ID: {{ item.producto_id }}</span>
+                    {% endif %}
+                    
+                    {% if item.exitoso %}
+                    <div style="color: #28a745; margin-top: 0.5rem;">
+                        ✓ Exitosa
+                        {% if item.cantidad %}
+                        - {{ item.cantidad }} productos
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div style="color: #dc3545; margin-top: 0.5rem;">
+                        ✗ Error: {{ item.error }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="fecha">
+                    {{ item.fecha|date:"d/m/Y H:i:s" }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: #666; text-align: center; padding: 2rem;">No hay historial de DummyJSON</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="color: #764ba2; margin-bottom: 1rem;">💱 ExchangeRate API - Historial de Conversiones</h3>
+    {% if historial_exchange %}
+    <div>
+        {% for item in historial_exchange %}
+        <div class="historial-item {% if not item.exitoso %}error{% endif %}">
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div style="flex: 1;">
+                    <strong style="color: #333;">{{ item.tipo|title }}</strong>
+                    
+                    {% if item.exitoso %}
+                    <div style="color: #28a745; margin-top: 0.5rem;">
+                        ✓ Exitosa
+                        {% if item.tipo == 'conversion' %}
+                        <br><span style="color: #666;">
+                            💵 ${{ item.monto_usd }} USD → 💰 ${{ item.monto_cop|floatformat:2 }} COP
+                            <br>Tasa: {{ item.tasa_usada|floatformat:2 }}
+                        </span>
+                        {% endif %}
+                        {% if item.tipo == 'obtener_tasa_cambio' %}
+                        <br><span style="color: #666;">
+                            Tasa USD/COP: {{ item.tasa_usd_cop|floatformat:2 }}
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div style="color: #dc3545; margin-top: 0.5rem;">
+                        ✗ Error: {{ item.error }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="fecha">
+                    {{ item.fecha|date:"d/m/Y H:i:s" }}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: #666; text-align: center; padding: 2rem;">No hay historial de ExchangeRate</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3>💡 Información</h3>
+    <p style="color: #666; line-height: 1.6;">
+        Este historial se almacena en MongoDB (base de datos no relacional) para demostrar la integración de múltiples bases de datos:
+    </p>
+    <ul style="color: #666; margin-left: 1.5rem; margin-top: 1rem; line-height: 1.8;">
+        <li><strong>PostgreSQL:</strong> Almacena productos sincronizados (ProductoAPI) y consultas (ConsultaAPI)</li>
+        <li><strong>MongoDB:</strong> Almacena historial detallado de todas las consultas a APIs</li>
+    </ul>
+</div>
+{% endblock %}

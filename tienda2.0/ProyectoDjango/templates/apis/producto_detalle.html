@@ -1,0 +1,84 @@
+{% extends 'apis/base.html' %}
+
+{% block title %}{{ producto.titulo }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <a href="{% url 'apis:lista_productos' %}" style="color: #667eea; text-decoration: none; margin-bottom: 1rem; display: inline-block;">← Volver a la lista</a>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+        <div>
+            {% if producto.imagen_url %}
+            <img src="{{ producto.imagen_url }}" 
+                 alt="{{ producto.titulo }}" 
+                 style="width: 100%; border-radius: 12px;"
+                 crossorigin="anonymous"
+                 loading="lazy"
+                 onerror="this.onerror=null; this.src='https://placehold.co/500x500/667eea/white?text=Producto';">
+            {% else %}
+            <img src="https://placehold.co/500x500/667eea/white?text=Producto" alt="Sin imagen" style="width: 100%; border-radius: 12px;">
+            {% endif %}
+        </div>
+        
+        <div>
+            <span class="category">{{ producto.categoria }}</span>
+            <h1 style="margin: 1rem 0; color: #333;">{{ producto.titulo }}</h1>
+            
+            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                <div style="font-size: 2rem; font-weight: bold; color: #667eea; margin-bottom: 0.5rem;">
+                    💵 ${{ producto.precio_usd }} USD
+                </div>
+                {% if producto.precio_cop %}
+                <div style="font-size: 1.5rem; color: #764ba2;">
+                    💰 ${{ producto.precio_cop|floatformat:0 }} COP
+                </div>
+                {% if tasa_cambio %}
+                <p style="color: #666; font-size: 0.9rem; margin-top: 0.5rem;">
+                    Tasa de cambio: 1 USD = {{ tasa_cambio|floatformat:2 }} COP
+                </p>
+                {% endif %}
+                {% endif %}
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="color: #333; margin-bottom: 0.5rem;">Descripción</h3>
+                <p style="color: #666; line-height: 1.6;">{{ producto.descripcion }}</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                    <strong style="color: #667eea;">Marca:</strong>
+                    <p style="color: #333; margin-top: 0.5rem;">{{ producto.marca|default:"N/A" }}</p>
+                </div>
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                    <strong style="color: #667eea;">Stock:</strong>
+                    <p style="color: #333; margin-top: 0.5rem;">{{ producto.stock }} unidades</p>
+                </div>
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                    <strong style="color: #667eea;">Rating:</strong>
+                    <p style="color: #333; margin-top: 0.5rem;">⭐ {{ producto.rating|default:"N/A" }}</p>
+                </div>
+                <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+                    <strong style="color: #667eea;">ID API:</strong>
+                    <p style="color: #333; margin-top: 0.5rem;">#{{ producto.api_id }}</p>
+                </div>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <strong style="color: #667eea;">Sincronizado:</strong>
+                <p style="color: #666; margin-top: 0.5rem;">{{ producto.sincronizado_en|date:"d/m/Y H:i" }}</p>
+                <strong style="color: #667eea;">Última actualización:</strong>
+                <p style="color: #666; margin-top: 0.5rem;">{{ producto.actualizado_en|date:"d/m/Y H:i" }}</p>
+            </div>
+            
+            <div style="display: flex; gap: 1rem;">
+                <form method="post" action="{% url 'apis:eliminar_producto' producto.id %}" style="display: inline;" onsubmit="return confirm('¿Estás seguro de eliminar este producto?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">🗑️ Eliminar Producto</button>
+                </form>
+                <a href="{% url 'apis:lista_productos' %}" class="btn" style="background: #e0e0e0;">Cancelar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'apis/base.html' %}
+
+{% block content %}
+<div class="stats">
+    <div class="stat-card">
+        <h3>{{ total_productos }}</h3>
+        <p>Productos Totales</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ productos_activos }}</h3>
+        <p>Productos Activos</p>
+    </div>
+    <div class="stat-card">
+        <h3>{{ total_consultas }}</h3>
+        <p>Consultas API</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>🚀 Bienvenido al Sistema de Integración de APIs</h2>
+    <p style="margin-bottom: 1.5rem; color: #666; line-height: 1.6;">
+        Este sistema integra dos APIs públicas siguiendo el patrón MVC:
+    </p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+        <div style="border: 2px solid #667eea; border-radius: 12px; padding: 1.5rem;">
+            <h3 style="color: #667eea; margin-bottom: 1rem;">📦 API 1: DummyJSON</h3>
+            <p style="color: #666; margin-bottom: 1rem;">Obtiene productos de prueba con información detallada.</p>
+            <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                <li>Sincronización de productos</li>
+                <li>Búsqueda en tiempo real</li>
+                <li>Almacenamiento en PostgreSQL</li>
+                <li>Historial en MongoDB</li>
+            </ul>
+        </div>
+        
+        <div style="border: 2px solid #764ba2; border-radius: 12px; padding: 1.5rem;">
+            <h3 style="color: #764ba2; margin-bottom: 1rem;">💱 API 2: ExchangeRate</h3>
+            <p style="color: #666; margin-bottom: 1rem;">Convierte precios de USD a COP en tiempo real.</p>
+            <ul style="color: #666; margin-left: 1.5rem; line-height: 1.8;">
+                <li>Tasas de cambio actualizadas</li>
+                <li>Conversión automática</li>
+                <li>Historial de conversiones</li>
+                <li>Almacenamiento en MongoDB</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="{% url 'apis:lista_productos' %}" class="btn btn-primary">Ver Productos</a>
+        <form method="post" action="{% url 'apis:sincronizar_productos' %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Sincronizar Productos</button>
+        </form>
+        <a href="{% url 'apis:buscar' %}" class="btn btn-warning">Buscar en API</a>
+        <a href="{% url 'apis:historial' %}" class="btn btn-primary">Ver Historial MongoDB</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>📊 Últimas Consultas</h2>
+    {% if ultimas_consultas %}
+    <table>
+        <thead>
+            <tr>
+                <th>API</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Detalles</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for consulta in ultimas_consultas %}
+            <tr>
+                <td><strong>{{ consulta.api_nombre }}</strong></td>
+                <td>{{ consulta.get_tipo_display }}</td>
+                <td>{{ consulta.fecha_consulta|date:"d/m/Y H:i" }}</td>
+                <td>
+                    {% if consulta.exitosa %}
+                    <span style="color: #28a745;">✓ Exitosa</span>
+                    {% else %}
+                    <span style="color: #dc3545;">✗ Error</span>
+                    {% endif %}
+                </td>
+                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis;">{{ consulta.detalles }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #666; text-align: center; padding: 2rem;">No hay consultas registradas aún.</p>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>🔧 Arquitectura MVC</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+            <h3 style="color: #667eea; margin-bottom: 0.5rem;">📋 Modelo</h3>
+            <p style="color: #666; font-size: 0.9rem;">ProductoAPI, ConsultaAPI (PostgreSQL) + MongoDB para historial</p>
+        </div>
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+            <h3 style="color: #667eea; margin-bottom: 0.5rem;">👁️ Vista</h3>
+            <p style="color: #666; font-size: 0.9rem;">Templates HTML con diseño responsivo</p>
+        </div>
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+            <h3 style="color: #667eea; margin-bottom: 0.5rem;">🎮 Controlador</h3>
+            <p style="color: #666; font-size: 0.9rem;">views.py orquesta los servicios y modelos</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
