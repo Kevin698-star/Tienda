@@ -1,0 +1,567 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🛒 Carrito de Compras - Supermercado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        /* Carrito wrapper */
+        .carrito-wrapper {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: fadeInUp 0.6s ease;
+            border: 3px solid #a855f7;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tabla responsive */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+        }
+
+        thead th {
+            padding: 18px 15px;
+            font-weight: 600;
+            text-align: left;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        thead th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        thead th:last-child {
+            border-radius: 0 12px 0 0;
+            text-align: center;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:hover {
+            background: #f5f3ff;
+            transform: scale(1.01);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody td {
+            padding: 20px 15px;
+            vertical-align: middle;
+        }
+
+        /* Imagen producto */
+        .producto-imagen {
+            width: 90px;
+            height: 90px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+            transition: transform 0.3s ease;
+            border: 2px solid #e9d5ff;
+        }
+
+        .producto-imagen:hover {
+            transform: scale(1.1);
+            border-color: #a855f7;
+        }
+
+        /* Nombre producto */
+        .producto-nombre {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 1.05rem;
+        }
+
+        /* Cantidad badge */
+        .cantidad-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        }
+
+        /* Precio */
+        .precio {
+            font-weight: 700;
+            color: #7c3aed;
+            font-size: 1.1rem;
+        }
+
+        .subtotal {
+            font-weight: 800;
+            color: #2d3748;
+            font-size: 1.2rem;
+        }
+
+        /* Botón eliminar */
+        .btn-eliminar {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-eliminar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Resumen total */
+        .resumen-total {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            padding: 30px;
+            border-radius: 16px;
+            margin-top: 30px;
+            border: 2px solid #c084fc;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #4a5568;
+        }
+
+        .total-final {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 20px;
+            border-top: 3px solid #7c3aed;
+            margin-top: 10px;
+        }
+
+        .total-final .label {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .total-final .monto {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Carrito vacío */
+        .carrito-vacio {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .icono-vacio {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
+            filter: grayscale(0.3);
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        .carrito-vacio h2 {
+            color: #7c3aed;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .carrito-vacio p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        /* Acciones */
+        .acciones {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(124, 58, 237, 0.5);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #7c3aed;
+            border: 3px solid #7c3aed;
+        }
+
+        .btn-secondary:hover {
+            background: #7c3aed;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* Contador items */
+        .items-count {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Envío gratis badge */
+        .envio-gratis {
+            color: #10b981;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header p {
+                font-size: 0.95rem;
+            }
+
+            .carrito-wrapper {
+                padding: 25px 20px;
+                border-radius: 16px;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tbody tr {
+                display: block;
+                margin-bottom: 20px;
+                border: 2px solid #e9d5ff;
+                border-radius: 12px;
+                padding: 15px;
+                background: white;
+            }
+
+            tbody tr:hover {
+                transform: none;
+            }
+
+            tbody td {
+                display: flex;
+                justify-content: space-between;
+                padding: 10px 0;
+                border-bottom: 1px solid #f0f0f0;
+                text-align: left;
+            }
+
+            tbody td:last-child {
+                border-bottom: none;
+                justify-content: center;
+            }
+
+            tbody td::before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #7c3aed;
+            }
+
+            tbody td[data-label="Imagen"] {
+                justify-content: center;
+            }
+
+            tbody td[data-label="Imagen"]::before {
+                display: none;
+            }
+
+            .producto-imagen {
+                margin: 0 auto;
+                width: 100px;
+                height: 100px;
+            }
+
+            .acciones {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .total-final .label {
+                font-size: 1.2rem;
+            }
+
+            .total-final .monto {
+                font-size: 1.8rem;
+            }
+
+            .resumen-total {
+                padding: 20px;
+            }
+
+            .icono-vacio {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <h1>
+            <span>🛒</span>
+            Tu Carrito de Compras
+        </h1>
+        <p>Revisa los productos que agregaste al carrito</p>
+        {% if carrito and carrito.items.exists %}
+        <div class="items-count">
+            📦 {{ carrito.items.count }} producto{{ carrito.items.count|pluralize }} en tu carrito
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Contenido del carrito -->
+    <div class="carrito-wrapper">
+        {% if carrito and carrito.items.exists %}
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Imagen</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Subtotal</th>
+                            <th style="text-align: center;">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in carrito.items.all %}
+                        <tr>
+                            <td data-label="Imagen">
+                                {% if item.producto.imagen_mostrar %}
+                                    <img src="{{ item.producto.imagen_mostrar }}" alt="{{ item.producto.nombre }}" class="producto-imagen">
+                                {% else %}
+                                    <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen" class="producto-imagen">
+                                {% endif %}
+                            </td>
+                            <td data-label="Producto">
+                                <span class="producto-nombre">{{ item.producto.nombre }}</span>
+                            </td>
+                            <td data-label="Cantidad">
+                                <span class="cantidad-badge">✕ {{ item.cantidad }}</span>
+                            </td>
+                            <td data-label="Precio">
+                                <span class="precio">${{ item.producto.precio }} COP</span>
+                            </td>
+                            <td data-label="Subtotal">
+                                <span class="subtotal">${{ item.subtotal }} COP</span>
+                            </td>
+                            <td data-label="Acción" style="text-align: center;">
+                                <a href="{% url 'eliminar_del_carrito' item.id %}" class="btn-eliminar">
+                                    🗑️ Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Resumen Total -->
+            <div class="resumen-total">
+                <div class="total-row">
+                    <span>💰 Subtotal de productos:</span>
+                    <span class="precio">${{ carrito.total }} COP</span>
+                </div>
+                <div class="total-row">
+                    <span>🚚 Envío:</span>
+                    <span class="envio-gratis">
+                        <span>✓</span>
+                        <span>¡Envío Gratis!</span>
+                    </span>
+                </div>
+                <div class="total-final">
+                    <span class="label">💳 Total a pagar:</span>
+                    <span class="monto">${{ carrito.total }} COP</span>
+                </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="acciones">
+                <a href="{% url 'tienda' %}" class="btn btn-secondary">
+                    ⬅️ Seguir Comprando
+                </a>
+                <!--<button class="btn btn-primary"
+                    💳 Proceder al Pago
+                </button>>-->
+            </div>
+
+        {% else %}
+            <!-- Carrito vacío -->
+            <div class="carrito-vacio">
+                <div class="icono-vacio">🛒</div>
+                <h2>Tu carrito está vacío</h2>
+                <p>¡Explora nuestro supermercado y llena tu carrito con productos increíbles!</p>
+            </div>
+
+            <div class="acciones">
+                <a href="{% url 'tienda' %}" class="btn btn-primary">
+                    🛍️ Ir al Supermercado
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

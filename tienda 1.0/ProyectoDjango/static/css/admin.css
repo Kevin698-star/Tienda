@@ -1,0 +1,19 @@
+/* static/css/admin.css */
+body {
+    background-color: #f7f9fc !important;
+}
+
+#header {
+    background-color: #4e73df !important;
+    color: white !important;
+}
+
+.module h2 {
+    background-color: #1cc88a !important;
+    color: white !important;
+}
+
+.button, input[type=submit] {
+    background-color: #36b9cc !important;
+    color: white !important;
+}
